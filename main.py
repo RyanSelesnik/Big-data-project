@@ -32,7 +32,7 @@ else:
         stats = Comm.recv(source=procid)
         global_means.append(stats['mean'])
 
-        np.concatenate(np.array(sorted_mags), np.array(stats['sorted_mags']))
+        # np.concatenate(np.array(sorted_mags), np.array(stats['sorted_mags']))
 
     global_means = np.array(global_means).mean()
     print(global_means)
