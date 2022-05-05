@@ -6,9 +6,11 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 numprocs = comm.Get_size()
 
-
 if rank == 0:
-    df = pd.read_csv('Accelerometer.csv')
+    filename = input('Enter file name: ')
+    time_range = input('Enter ')
+
+    df = pd.read_csv(filename)
     chunks = np.array_split(df, numprocs)
 else:
     chunks = None
@@ -24,3 +26,4 @@ gathered_chunks = comm.gather(stats, root=0)
 if rank == 0:
     for chunk in gathered_chunks:
         print(chunk)
+        # median_of_medians()
