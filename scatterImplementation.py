@@ -1,3 +1,4 @@
+from fileinput import filename
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
@@ -7,8 +8,9 @@ rank = comm.Get_rank()
 numprocs = comm.Get_size()
 
 if rank == 0:
-    filename = input('Enter file name: ')
-    time_range = input('Enter ')
+    # filename = input('Enter file name: ')
+    # time_range = input('Enter ')
+    filename = 'Accelerometer.csv'
 
     df = pd.read_csv(filename)
     chunks = np.array_split(df, numprocs)
@@ -24,6 +26,9 @@ stats['median'] = np.quantile(magnitudes, 0.5)
 gathered_chunks = comm.gather(stats, root=0)
 
 if rank == 0:
+    medians = []
     for chunk in gathered_chunks:
-        print(chunk)
-        # median_of_medians()
+        medians.append(chunk['median'])
+
+    print(np.quantile(medians, 0.5))
+    # median_of_medians()
