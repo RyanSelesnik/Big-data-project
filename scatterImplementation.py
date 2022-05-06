@@ -1,4 +1,3 @@
-import dask.dataframe as dd
 from fileinput import filename
 from mpi4py import MPI
 import pandas as pd
@@ -9,7 +8,7 @@ rank = comm.Get_rank()
 numprocs = comm.Get_size()
 
 if rank == 0:
-    filename = 'Accelerometer.csv'
+    filename = '../Accelerometer.csv'
     df = pd.read_csv(filename)
     chunks = np.array_split(df, numprocs)
 else:
@@ -44,5 +43,3 @@ if rank == 0:
     print(
         f'----------MPI-----------\n\nMedian:\t{median} \nQ1:\t{Q1} \nQ3: \t{Q3} \nIQR: \t{IQR}\nUpper fence: \t{upper_fence}\nLower fence: \t{lower_fence}'
     )
-
-
