@@ -8,9 +8,11 @@ rank = comm.Get_rank()
 numprocs = comm.Get_size()
 
 if rank == 0:
-    filename = input("pls enter file name: ")
+    # filename = input("pls enter file name: ")
+    filename = './Accelerometer.csv'
     df = pd.read_csv(filename)
     chunks = np.array_split(df, numprocs)
+    print(MPI.Get_processor_name())
 else:
     chunks = None
 
@@ -49,6 +51,10 @@ if rank == 0:
 
     minimum = np.amin(minimums)
     maximum = np.amax(maximums)
+
+    # Get outliers
+    # if min and max are outside upper and lower fences, then get outliers
+
     print(
         f'----------MPI-----------\n\nMedian:\t{median} \nQ1:\t{Q1} \nQ3: \t{Q3} \nIQR: \t{IQR}\n Minimum: \t{minimum}\n Maximum: \t{maximum} \nUpper fence: \t{upper_fence}\nLower fence: \t{lower_fence}'
     )
