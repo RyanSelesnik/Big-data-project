@@ -1,4 +1,5 @@
 from fileinput import filename
+from metakernel import Magic
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
@@ -6,6 +7,15 @@ import numpy as np
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 numprocs = comm.Get_size()
+
+
+def getQuartile(arr, quartile):
+    n = len(arr)
+    if n % 2 == 0:
+        return (arr[int(n*quartile) - 1] + arr[int(n*quartile)])/2
+    else:
+        return arr[int(n*quartile)]
+
 
 if rank == 0:
     # filename = input("pls enter file name: ")
@@ -19,12 +29,13 @@ else:
 chunk = comm.scatter(chunks, root=0)
 vectors = chunk[['x', 'y', 'z']]
 magnitudes = np.apply_along_axis(np.linalg.norm, 1, vectors)
+magnitudes.sort()
 
 # Get median, quartiles, min and max magnitudes of each chunk
 stats = {}
-stats['median'] = np.quantile(magnitudes, 0.5)
-stats['q1'] = np.quantile(magnitudes, 0.25)
-stats['q3'] = np.quantile(magnitudes, 0.75)
+stats['median'] = getQuartile(magnitudes, 0.5)
+stats['q1'] = getQuartile(magnitudes, 0.25)
+stats['q3'] = getQuartile(magnitudes, 0.75)
 stats['minimum'] = np.amin(magnitudes)
 stats['maximum'] = np.amax(magnitudes)
 gathered_chunks = comm.gather(stats, root=0)
@@ -42,9 +53,12 @@ if rank == 0:
         minimums.append(stats['minimum'])
         maximums.append(stats['maximum'])
 
-    median = np.quantile(medians, 0.5)
-    Q1 = np.quantile(Q1s, 0.25)
-    Q3 = np.quantile(Q3s, 0.75)
+    medians.sort()
+    Q1s.sort()
+    Q3s.sort()
+    median = getQuartile(medians, 0.5)
+    Q1 = getQuartile(Q1s, 0.25)
+    Q3 = getQuartile(Q3s, 0.75)
     IQR = Q3 - Q1
     upper_fence = Q3 + (1.5 * IQR)
     lower_fence = Q1 - (1.5 * IQR)
