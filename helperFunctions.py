@@ -1,5 +1,5 @@
 import csv
-
+from datetime import datetime
 # Get quartile assuming the input array is sorted
 
 
@@ -27,7 +27,7 @@ def truncate_df_with_interval(df, epoch_start, epoch_end):
     df.drop(df[df['time'] > epoch_end].index, inplace=True)
 
 
-def write_to_csv(data):
+def write_to_csv(data, output_file_name):
     fieldnames = ['file_name', 'lower_quartile', 'median', 'upper_quartile',
                   'interquartile_range', 'minimum', 'maximum', 'lower_fence', 'upper_fence']
 
@@ -36,3 +36,12 @@ def write_to_csv(data):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+
+def preprocess_data(df):
+    num_null = df.isna().any(axis=1).sum()
+    if num_null/len(df) > 0.05:
+        raise ValueError(
+            "There are too many many missing values, find another data set")
+    else:
+        df.dropna(inplace=True)
