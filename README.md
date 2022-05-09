@@ -14,7 +14,7 @@ To run the code with the example data set given in `/data/Accelerometer.csv`, us
 ./run.sh 10 ./data/Accelerometer.csv
 ```
 
-This will run the code using the nodes specified in `./hostfile`. Furthermore, the results are written to './statistical_indicators.csv'
+This will run the code using the nodes specified in `./hostfile`. Furthermore, the results are written to `./statistical_indicators.csv`
 
 ## Member Contributions:
 
