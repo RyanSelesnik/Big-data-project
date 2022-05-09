@@ -1,4 +1,3 @@
-from fileinput import filename
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
