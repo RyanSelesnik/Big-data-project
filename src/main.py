@@ -34,7 +34,6 @@ else:
     chunks = None
 
 chunk = comm.scatter(chunks, root=0)
-# Change to last three columns
 vectors = chunk[['x', 'y', 'z']]
 magnitudes = np.apply_along_axis(np.linalg.norm, 1, vectors)
 magnitudes.sort()
@@ -116,4 +115,4 @@ if rank == 0:
     axes.bxp(stat, showfliers=True)
     axes.set_label('Magnitude')
     axes.set_yscale('log')
-    plt.savefig('box_plot.svg')
+    plt.savefig('box_plot.png')
