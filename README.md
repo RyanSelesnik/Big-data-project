@@ -24,6 +24,12 @@ This will prompt you with two options, (1) and (2). Choose (1) to run the entire
 
 This will run the code with 10 processes using the nodes specified in `./hostfile`. Furthermore, the results are written to `./statistical_indicators.csv`
 
+Note, to ensure the run script is executable, run the following:
+
+```
+chmod +x run.sh
+```
+
 ## Member Contributions:
 
 Jamie: 
