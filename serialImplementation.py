@@ -2,6 +2,8 @@ from fileinput import filename
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
+import sys
+import time
 
 # filename = input("pls enter file name: ")
 
@@ -14,7 +16,8 @@ def getQuartile(arr, quartile):
         return arr[int(n*quartile)]
 
 
-filename = './Accelerometer.csv'
+t0 = time.time()
+filename = sys.argv[1]
 df = pd.read_csv(filename)
 vectors = df[['x', 'y', 'z']]
 magnitudes = np.apply_along_axis(np.linalg.norm, 1, vectors)
@@ -29,6 +32,9 @@ lower_fence = Q1 - (1.5 * IQR)
 minimum = np.amin(magnitudes)
 maximum = np.amax(magnitudes)
 
+total = time.time() - t0
 print(
     f'----------Serial-----------\n\nMedian:\t{median} \nQ1:\t{Q1} \nQ3: \t{Q3} \nIQR: \t{IQR}\n Minimum: \t{minimum}\n Maximum: \t{maximum} \nUpper fence: \t{upper_fence}\nLower fence: \t{lower_fence}'
 )
+
+print(f'Total time is: {total}')

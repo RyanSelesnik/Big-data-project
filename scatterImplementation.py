@@ -1,32 +1,28 @@
 from fileinput import filename
-from metakernel import Magic
 from mpi4py import MPI
 import pandas as pd
 import numpy as np
+from helperFunctions import getQuartile
+from helperFunctions import get_epochs
+from helperFunctions import truncate_df_with_interval
+from helperFunctions import write_to_csv
+
+import sys
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 numprocs = comm.Get_size()
 
-
-def getQuartile(arr, quartile):
-    n = len(arr)
-    if n % 2 == 0:
-        return (arr[int(n*quartile) - 1] + arr[int(n*quartile)])/2
-    else:
-        return arr[int(n*quartile)]
-
-
 if rank == 0:
-    # filename = input("pls enter file name: ")
-    filename = './Accelerometer.csv'
+    global_start_time = MPI.Wtime()
+    filename = sys.argv[1]
     df = pd.read_csv(filename)
     chunks = np.array_split(df, numprocs)
-    print(MPI.Get_processor_name())
 else:
     chunks = None
-
+    
 chunk = comm.scatter(chunks, root=0)
+# Change to last three columns
 vectors = chunk[['x', 'y', 'z']]
 magnitudes = np.apply_along_axis(np.linalg.norm, 1, vectors)
 magnitudes.sort()
@@ -66,9 +62,21 @@ if rank == 0:
     minimum = np.amin(minimums)
     maximum = np.amax(maximums)
 
-    # Get outliers
-    # if min and max are outside upper and lower fences, then get outliers
+    statistical_indicators = {
+        'file_name': filename,
+        'lower_quartile': Q1,
+        'median': median,
+        'upper_quartile': Q3,
+        'interquartile_range': IQR,
+        'minimum': minimum,
+        'maximum': maximum,
+        'lower_fence': lower_fence,
+        'upper_fence': upper_fence
+    }
+    total_time = MPI.Wtime() - global_start_time
+    write_to_csv(statistical_indicators)
 
     print(
-        f'----------MPI-----------\n\nMedian:\t{median} \nQ1:\t{Q1} \nQ3: \t{Q3} \nIQR: \t{IQR}\n Minimum: \t{minimum}\n Maximum: \t{maximum} \nUpper fence: \t{upper_fence}\nLower fence: \t{lower_fence}'
+        f'----------MPI-----------\n\n Number of processes: {numprocs}\nMedian:\t{median} \nQ1:\t{Q1} \nQ3: \t{Q3} \nIQR: \t{IQR}\n Minimum: \t{minimum}\n Maximum: \t{maximum} \nUpper fence: \t{upper_fence}\nLower fence: \t{lower_fence}'
     )
+    print(f'Final time is {total_time}')
