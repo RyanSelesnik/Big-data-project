@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import matplotlib.pyplot as plt
 
 from helperFunctions import getQuartile, preprocess_data
 from helperFunctions import get_epochs
@@ -12,6 +13,7 @@ from helperFunctions import write_to_csv
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 numprocs = comm.Get_size()
+all_outliers = []
 
 if rank == 0:
     answer = input(
@@ -93,3 +95,25 @@ if rank == 0:
     )
     print(f'\nThe above data has been written to ./{output_file_name}')
     print(f'\nThe total execution time is {total_time}')
+
+    vectors = df[['x', 'y', 'z']]
+    magnitudes = np.apply_along_axis(np.linalg.norm, 1, vectors)
+    for i in magnitudes:
+        if i > upper_fence or i < lower_fence:
+            all_outliers.append(i)
+
+    stat = [{
+        "label": "Summary",
+        "med": median,
+        "q1": Q1,
+        "q3": Q3,
+        "whislo": minimum,
+        "whishi": maximum,
+        "fliers": all_outliers
+    }]
+
+    fig, axes = plt.subplots(nrows=1, ncols=1)
+    axes.bxp(stat, showfliers=True)
+    axes.set_label('Magnitude')
+    axes.set_yscale('log')
+    plt.savefig('box_plot.svg')
