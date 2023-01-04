@@ -30,22 +30,4 @@ Note, to ensure the run script is executable, run the following:
 chmod +x run.sh
 ```
 
-## Member Contributions:
 
-Jamie: 
-* User input of time range in given data set
-* Sub-divided data set into 'chunks'
-* Approximating quartiles function
-* Report: introduction; algorithms and implementation; results
-
-Rachel:
-* User input of time range in given data set 
-* Extract new data set from time range
-* Approximating quartiles function
-* Report: background; algorithms and implementation; results
-
-Ryan: 
-* Scatter and Gather MPI implementation
-* Modularised code into separate functions
-* Approximating quartiles function
-* Report: results; pseudo-code; algorithms and implementation
